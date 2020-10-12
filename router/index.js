@@ -12,11 +12,11 @@ export default new VueRouter({
       path: '/story',
       name: 'story',
       component: Story,
-
-    }, {
-      path: '/log',
-      name: 'log',
-      component: Log,
-    }
+      children: [{
+        path: 'log',
+        name:'log',
+        component: Log
+      }]
+    },
   ]
 })

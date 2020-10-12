@@ -1,5 +1,6 @@
 <template>
   <div class="story" @mousewheel.prevent>
+    <audio :src="storyBgmUrl" autoplay="autoplay" loop="loop"></audio>
     <audio :src="storyText.voiceUrl" autoplay="autoplay"></audio>
     <audio :src="storySeUrl" autoplay="autoplay"></audio>
     <img :src="storyFloorUrl" id="story-floor">
@@ -18,7 +19,6 @@
          }"
          ondragstart="return false;">
     }
-    <audio :src="storyBgmUrl" loop="loop" autoplay="autoplay"></audio>
     <!--   这里可以插入想要自己定义的特效-->
     <ul class="story-lihui-area">
       <li v-for="(item,index) in storyLihuiList" :class="item.class" :style="{
@@ -42,16 +42,20 @@
     </ul>
     <!--    test case-->
     <div class="story-dialog-area" @click="nextSentence(0),testCase()">
-      <img class="dialog" :src=storyDialogUrl ondragstart="return false;">
-      <p class="text">
-        {{ storyText.showText }}
+      <img :src=storyDialogUrl ondragstart="return false;">
+      <p v-if="dialogClickCount%2==1" class="story-text">
+        {{ storyText.rollText }}
+      </p>
+      <p v-else class="story-text">
+        {{ storyText.immText }}
       </p>
     </div>
     <ul class="story-button-area">
       <li v-for="(item,_) in storyButtonList" @mouseenter="storyOverBtn(item)" @mouseleave="storyOffBtn(item)">
-        <router-link :to=item.routeId>
-          <img :src="item.btnSrc[item.btnIndex]" ondragstart="return false;">
-        </router-link>
+        <!--        注释掉下面一句的原因是，为了让按钮音效正常播放-->
+        <!--        <router-link :to=item.routeId @click="storyBtnClick">-->
+        <img :src="item.btnSrc[item.btnIndex]" @click="storyBtnClick(item)" ondragstart="return false;">
+        <!--        </router-link>-->
       </li>
     </ul>
     <router-view></router-view>
@@ -82,36 +86,42 @@ export default {
 
       storyFloorUrl: require('../assets/main2/black.png'),
 
-      storyText: {showText: '', voiceUrl: require('../assets/voice/fum_omake_00035.ogg')},
+      storyText: {rollText: '', immText: '', voiceUrl: require('../assets/voice/fum_omake_00035.ogg'), showMode: 0},
 
-      storyBackEndText: '无想神气和一！无想神气和一！无想神气和一！无想神气和一！无想神气和一！无想神气和一！无想神气和一！无想神气和一！',
+      storyLogText: '',
+
+      storyLogLength: 20,
+
+      storyBackEndText: '无想神气合一！无想神气合一！无想神气合一！无想神气合一！无想神气合一！无想神气合一！',
 
       textSpeed: 30,
+
+      dialogClickCount: 0,
 
       storyButtonList: [
         {
           btnSrc: [require('../assets/main2/b1_off.png'), require('../assets/main2/b1_on.png')],
-          routeId: '/log',
+          routeId: 'log',
           btnIndex: 0
         },
         {
           btnSrc: [require('../assets/main2/b2_off.png'), require('../assets/main2/b2_on.png')],
-          routeId: '/save',
+          routeId: 'save',
           btnIndex: 0
         },
         {
           btnSrc: [require('../assets/main2/b3_off.png'), require('../assets/main2/b3_on.png')],
-          routeId: '/load',
+          routeId: 'load',
           btnIndex: 0
         },
         {
           btnSrc: [require('../assets/main2/b4_off.png'), require('../assets/main2/b4_on.png')],
-          routeId: '/config',
+          routeId: 'config',
           btnIndex: 0
         },
         {
           btnSrc: [require('../assets/main2/b5_off.png'), require('../assets/main2/b5_on.png')],
-          routeId: '/return',
+          routeId: 'return',
           btnIndex: 0
         }
       ],
@@ -148,21 +158,46 @@ export default {
         }
       ],
 
+
       index: 0,
       testCaseMake: [require('../assets/bg/0072.png'), require('../assets/bg/0073.png')]
     }
   },
+
+  mounted() {
+    this.storyText.immText = this.storyBackEndText;
+    this.storyLogText = new Array(this.storyLogLength)
+    for (let i = 0; i < this.storyLogLength; i++) {
+      this.storyLogText[i] = '';
+    }
+  },
+
   methods: {
     /**
      * 获取下一句游戏文本
      * @param i 用于文本展示特效，无需修改
      */
-    nextSentence(i) {
+
+    nextSentence() {
+      this.dialogClickCount += 1
+      this.storyText.immText = this.storyBackEndText;
+      //类似懒加载
+      if (this.dialogClickCount % 2 == 1) {
+        this.rollNextSentence(0)
+      }
+    },
+
+    rollNextSentence(i) {
+      if (this.dialogClickCount % 2 != 1) {
+        i = 0
+      }
       if (i <= this.storyBackEndText.length) {
-        this.storyText.showText = this.storyBackEndText.slice(0, i++);
+
+        this.storyText.rollText = this.storyBackEndText.slice(0, i++);
         setTimeout(() => {
-          this.nextSentence(i);
+          this.rollNextSentence(i);
         }, this.textSpeed);
+
       }
     },
     /**
@@ -185,6 +220,32 @@ export default {
       this.storyMask.animationDuration = ''
       this.storyMask.animationDelay = ''
       this.storyMask.maskUrl = ''
+    },
+
+    storyOverBtn(item) {
+      item.btnIndex = 1;
+    },
+
+    storyOffBtn(item) {
+      item.btnIndex = 0;
+    },
+
+    //可保证按按钮时音效正常播放
+    storyBtnClick(item) {
+      let _this = this
+      this.storySeUrl = require('../assets/se/0049.ogg')
+      setTimeout(() => {
+        _this.storySeUrl = ''
+      }, 200)
+      console.log(this.logText)
+      console.log(this.logLength)
+      this.$router.push({
+        name: item.routeId,
+        params: {
+          logText: this.storyLogText,
+          logLength: this.storyLogLength
+        }
+      })
     },
 
 
@@ -328,7 +389,7 @@ img {
 }
 
 .story-dialog-area
-.text {
+.story-text {
   position: absolute;
 
   top: -10%;
