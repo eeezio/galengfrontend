@@ -22,26 +22,26 @@
     <!--   这里可以插入想要自己定义的特效-->
     <ul class="story-lihui-area">
       <li v-for="(item,index) in storyLihuiList" :class="item.class" :style="{
-  position: 'relative',
-  height: '100%',
-  width: '19%',
-  float: 'left',
-  listStyle: 'none',
-  animationName: item.animationName,
-  animationDuration: item.animationDuration,
-  animationDelay: item.animationDelay,
-  //控制动画后停止在该位置
-  animationFillMode:'forwards',
-  //css变量在vue中使用这种方式与data绑定
-  '--jump-up':item.jumpUp,
-  '--right-move':item.rightMove,
-  '--left-move':item.leftMove
-  }">
+          position: 'relative',
+          height: '100%',
+          width: '19%',
+          float: 'left',
+          listStyle: 'none',
+          animationName: item.animationName,
+          animationDuration: item.animationDuration,
+          animationDelay: item.animationDelay,
+          //控制动画后停止在该位置
+          animationFillMode:'forwards',
+          //css变量在vue中使用这种方式与data绑定
+          '--jump-up':item.jumpUp,
+          '--right-move':item.rightMove,
+          '--left-move':item.leftMove
+          }">
         <img :src="item.lihuiSrc" ondragstart="return false;">
       </li>
     </ul>
     <!--    test case-->
-    <div class="story-dialog-area" @click="nextSentence(0),testCase()">
+    <div class="story-dialog-area" @click="nextSentence(),testCase()">
       <img :src=storyDialogUrl ondragstart="return false;">
       <p v-if="dialogClickCount%2==1" class="story-text">
         {{ storyText.rollText }}
@@ -88,11 +88,7 @@ export default {
 
       storyText: {rollText: '', immText: '', voiceUrl: require('../assets/voice/fum_omake_00035.ogg'), showMode: 0},
 
-      storyLogText: '',
-
-      storyLogLength: 20,
-
-      storyBackEndText: '无想神气合一！无想神气合一！无想神气合一！无想神气合一！无想神气合一！无想神气合一！',
+      storyBackEndText: '',
 
       textSpeed: 30,
 
@@ -160,31 +156,46 @@ export default {
 
 
       index: 0,
-      testCaseMake: [require('../assets/bg/0072.png'), require('../assets/bg/0073.png')]
+      testText: ['计算机科学，研究计算机及其周围各种现象和规律的科学，亦即研究计算机系统结构、程序系统（即软件）、人工智能以及计算本身的性质和问题的学科。',
+        '计算机科学是一门包含各种各样与计算和信息处理相关主题的系统学科，从抽象的算法分析、形式化语法等等，到更具体的主题如编程语言、程序设计、软件和硬件等。',
+        '计算机科学分为理论计算机科学和实验计算机科学两个部分。后者常称为“计算机科学”而不冠以“实验”二字。',
+        '前者有其他名称，如计算理论、计算机理论、计算机科学基础、计算机科学数学基础等。数学文献中一般指理论计算机科学。'],
+      testCaseMask: [require('../assets/bg/0072.png'), require('../assets/bg/0073.png')],
+      testTextIndex: 0,
+      flag: 0
     }
   },
 
   mounted() {
+    this.storyBackEndText = this.queryNextSentence()
     this.storyText.immText = this.storyBackEndText;
-    this.storyLogText = new Array(this.storyLogLength)
-    for (let i = 0; i < this.storyLogLength; i++) {
-      this.storyLogText[i] = '';
-    }
   },
 
   methods: {
-    /**
-     * 获取下一句游戏文本
-     * @param i 用于文本展示特效，无需修改
-     */
 
+    /**
+     * 通过网络请求获取下一句文本
+     */
+    queryNextSentence() {
+      return this.testText[this.testTextIndex++]
+    },
+
+
+    /**
+     * 展示下一句游戏文本
+     */
     nextSentence() {
       this.dialogClickCount += 1
-      this.storyText.immText = this.storyBackEndText;
-      //类似懒加载
+      //滚动播完或者当前是立即显示，即可获取下一条文本
+      if (this.flag == 1 || this.dialogClickCount % 2 == 0) {
+        this.storyText.immText = this.storyBackEndText;
+        this.storyBackEndText = this.queryNextSentence();
+      }
       if (this.dialogClickCount % 2 == 1) {
         this.rollNextSentence(0)
       }
+      this.flag = 0
+      //类似懒加载
     },
 
     rollNextSentence(i) {
@@ -192,12 +203,17 @@ export default {
         i = 0
       }
       if (i <= this.storyBackEndText.length) {
-
         this.storyText.rollText = this.storyBackEndText.slice(0, i++);
         setTimeout(() => {
           this.rollNextSentence(i);
         }, this.textSpeed);
-
+      } else {
+        //滚动播完了，可以获取新闻文本了
+        this.flag = 1
+        //滚动播完了，下次要滚动开始
+        this.dialogClickCount = 0
+        //避免刷新成旧的immtext文本
+        this.storyText.immText = this.storyBackEndText;
       }
     },
     /**
@@ -237,14 +253,8 @@ export default {
       setTimeout(() => {
         _this.storySeUrl = ''
       }, 200)
-      console.log(this.logText)
-      console.log(this.logLength)
       this.$router.push({
         name: item.routeId,
-        params: {
-          logText: this.storyLogText,
-          logLength: this.storyLogLength
-        }
       })
     },
 
@@ -262,7 +272,7 @@ export default {
       this.storyText.voiceUrl = require('../assets/voice/fum_omake_00036.ogg')
 
       let temp = this.index
-      this.storyMask.maskUrl = this.testCaseMake[temp]
+      this.storyMask.maskUrl = this.testCaseMask[temp]
       this.storyMask.animationDelay = '0s,1.5s'
       this.storyMask.animationDuration = '1.5s,1s'
       this.storyMask.animationName = 'img-switch-light,img-switch-dark'
