@@ -168,7 +168,6 @@ export default {
 
   mounted() {
     this.storyBackEndText = this.queryNextSentence()
-    this.storyText.immText = this.storyBackEndText;
   },
 
   methods: {
@@ -253,9 +252,18 @@ export default {
       setTimeout(() => {
         _this.storySeUrl = ''
       }, 200)
-      this.$router.push({
-        name: item.routeId,
-      })
+      if (item.routeId != 'save')
+        this.$router.push({
+          name: item.routeId,
+        })
+      else {
+        this.$router.push({
+          name: item.routeId,
+          params: {
+            saveText: this.storyText.immText
+          }
+        })
+      }
     },
 
 
