@@ -1,5 +1,5 @@
 <template>
-  <div class="story" @mousewheel.prevent>
+  <div class="story" @mousewheel.prevent ref="story">
     <audio :src="storyBgmUrl" autoplay="autoplay" loop="loop"></audio>
     <audio :src="storyText.voiceUrl" autoplay="autoplay"></audio>
     <audio :src="storySeUrl" autoplay="autoplay"></audio>
@@ -63,6 +63,9 @@
 </template>
 
 <script>
+
+import html2canvas from 'html2canvas'
+
 export default {
   name: "Story",
 
@@ -154,6 +157,10 @@ export default {
         }
       ],
 
+      flag: 0,
+
+      storySaveImgUrl: '',
+
 
       index: 0,
       testText: ['计算机科学，研究计算机及其周围各种现象和规律的科学，亦即研究计算机系统结构、程序系统（即软件）、人工智能以及计算本身的性质和问题的学科。',
@@ -162,7 +169,6 @@ export default {
         '前者有其他名称，如计算理论、计算机理论、计算机科学基础、计算机科学数学基础等。数学文献中一般指理论计算机科学。'],
       testCaseMask: [require('../assets/bg/0072.png'), require('../assets/bg/0073.png')],
       testTextIndex: 0,
-      flag: 0
     }
   },
 
@@ -257,14 +263,24 @@ export default {
           name: item.routeId,
         })
       else {
-        this.$router.push({
-          name: item.routeId,
-          params: {
-            saveText: this.storyText.immText
+        let self = this
+        //嵌套的异步then，保证进入save界面时图片已经截取完毕
+        html2canvas(this.$refs.story).then((canvas) => {
+            let dataURL = canvas.toDataURL("image/jpeg", 0.1)
+            self.storySaveImgUrl = dataURL
           }
+        ).then(() => {
+          this.$router.push({
+            name: item.routeId,
+            params: {
+              saveText: this.storyText.immText,
+              saveImage: this.storySaveImgUrl,
+            }
+          })
         })
       }
-    },
+    }
+    ,
 
 
     testCase: function () {
@@ -295,6 +311,13 @@ export default {
 </script>
 
 <style>
+.story {
+  position: absolute;
+
+  height: 100%;
+  width: 100%;
+}
+
 #story-floor {
   position: absolute;
   margin: -1%;

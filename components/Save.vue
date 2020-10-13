@@ -4,7 +4,7 @@
     <div class="save-area">
       <div v-for="(item,index) in saveBtnContext" class="save-button" @click="saveData(index)">
         <img :src="saveBtnUrl">
-        <img class="save-data-image" v-if="item.haveData==1" :src="item.image">
+        <img class="save-data-image" v-if="item.image!=''" :src="item.image">
         <p class="save-text" v-if="item.haveData==1">{{ item.saveText }}</p>
       </div>
 
@@ -16,15 +16,13 @@
 export default {
   name: "Save",
 
-  mounted() {
-    this.saveText = this.$route.params.saveText
-  },
 
   data() {
     return {
       saveBgUrl: require('../assets/saveload/back_save.png'),
       saveBtnUrl: require('../assets/saveload/btn_plate_back_off.png'),
       saveText: '',
+      saveImage: '',
       saveBtnContext: [{
         haveData: 0,
         image: '',
@@ -70,6 +68,8 @@ export default {
 
   methods: {
     saveData(i) {
+      this.saveText = this.$route.params.saveText
+      this.saveImage = this.$route.params.saveImage+' '
       this.saveBtnContext[i].haveData = 1
       if (this.saveText.length >= 10) {
         this.saveBtnContext[i].saveText = this.saveText.slice(0, 20)
@@ -77,7 +77,7 @@ export default {
       } else {
         this.saveBtnContext[i].saveText = this.saveText
       }
-      console.log(this.saveBtnContext[i].saveText)
+      this.saveBtnContext[i].image = this.saveImage
     }
   }
 }
@@ -116,8 +116,11 @@ export default {
 
 .save-data-image {
   position: absolute;
+
   top: 10%;
-  left: 10%;
+  left: 5%;
+  width: 40%;
+  height: 80%;
 }
 
 .save-text {
