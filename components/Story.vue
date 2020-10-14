@@ -19,7 +19,6 @@
          }"
          ondragstart="return false;">
     }
-    <!--   这里可以插入想要自己定义的特效-->
     <ul class="story-lihui-area">
       <li v-for="(item,index) in storyLihuiList" :class="item.class" :style="{
           position: 'relative',
