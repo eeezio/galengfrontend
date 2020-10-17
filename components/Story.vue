@@ -88,7 +88,7 @@ export default {
 
       storyFloorUrl: require('../assets/main2/black.png'),
 
-      storyText: {rollText: '', immText: '', voiceUrl: require('../assets/voice/fum_omake_00035.ogg'), showMode: 0},
+      storyText: {rollText: '', immText: '', voiceUrl: require('../assets/voice/fum_omake_00035.ogg')},
 
       storyBackEndText: '',
 
@@ -119,7 +119,7 @@ export default {
         },
         {
           btnSrc: [require('../assets/main2/b5_off.png'), require('../assets/main2/b5_on.png')],
-          routeId: 'return',
+          routeId: 'title',
           btnIndex: 0
         }
       ],
@@ -257,11 +257,13 @@ export default {
       setTimeout(() => {
         _this.storySeUrl = ''
       }, 200)
-      if (item.routeId != 'save')
+      if (item.routeId != 'save' && item.routeId != 'title')
         this.$router.push({
           name: item.routeId,
         })
-      else {
+      else if (item.routeId == 'title') {
+        this.$router.go(-1);
+      } else {
         let self = this
         //嵌套的异步then，保证进入save界面时图片已经截取完毕
         html2canvas(this.$refs.story).then((canvas) => {

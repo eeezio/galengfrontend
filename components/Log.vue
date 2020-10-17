@@ -13,7 +13,7 @@
         </ul>
       </el-scrollbar>
     </div>
-    <div class="log-return-button" @mouseenter="logOverBtn(item)" @mouseleave="logOffBtn(item)" @click="logClickReturn">
+    <div class="log-return-button" @mouseenter="logOverBtn()" @mouseleave="logOffBtn()" @click="logClickReturn">
       <img :src="logButton.btnSrc[logButton.btnIndex]">
     </div>
   </div>
