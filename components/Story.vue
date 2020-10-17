@@ -262,6 +262,7 @@ export default {
           name: item.routeId,
         })
       else if (item.routeId == 'title') {
+        this.$emit('playBgm');
         this.$router.go(-1);
       } else {
         let self = this

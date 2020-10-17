@@ -6,10 +6,11 @@
     <audio :src="titleBgmUrl" autoplay="autoplay" loop="loop"></audio>
     <ul class="title-button-area">
       <li v-for="(item,index) in titleButtonList" @mouseenter="titleOverBtn(item)" @mouseleave="titleOffBtn(item)"
-          @click="titleStopBgm">
-        <router-link :to=item.routeId>
-          <img :src="item.btnSrc[item.btnIndex]" ondragstart="return false;">
-        </router-link>
+          @click="titleStopBgm(item)">
+
+        <!--        <router-link :to=item.routeId  v-on:playBgm="storyToTitle">-->
+        <img :src="item.btnSrc[item.btnIndex]" ondragstart="return false;">
+        <!--        </router-link>-->
       </li>
     </ul>
     <!--    vue提供的过渡操作-->
@@ -30,7 +31,7 @@ export default {
       titleBgmUrl: require('../assets/bgm/bgm17.ogg'),
       titleButtonList: [{
         btnSrc: [require('../assets/title/btn_start01_off.png'), require('../assets/title/btn_start01_over.png')],
-        routeId: "/story",
+        routeId: "story",
         btnIndex: 0
       }, {
         btnSrc: [require('../assets/title/btn_load01_off.png'), require('../assets/title/btn_load01_over.png')],
@@ -54,7 +55,13 @@ export default {
     }
   },
 
-
+  watch: {
+    $route(to, from) {
+      if (to.path == '/') {
+        this.titleBgmUrl = require('../assets/bgm/bgm17.ogg');
+      }
+    }
+  },
   methods: {
     /**
      * 鼠标进入按钮，切换按钮显示的图片，由indexBtn变量控制
@@ -73,16 +80,13 @@ export default {
     /**
      * 停止标题音乐
      */
-    titleStopBgm: function () {
+    titleStopBgm: function (item) {
       this.titleBgmUrl = ''
+      this.$router.push(({
+        name: item.routeId,
+      }))
     },
 
-    /**
-     * 开始标题音乐
-     */
-    startBgm: function () {
-      this.titleBgmUrl = require('../assets/bgm/bgm17.ogg')
-    },
 
     /**
      * method:改变标题背景图片
