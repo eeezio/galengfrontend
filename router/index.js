@@ -4,6 +4,7 @@ import VueRouter from "vue-router";
 import Story from "../components/Story";
 import Log from "../components/Log";
 import Save from "../components/Save";
+import Config from "../components/Config";
 
 Vue.use(VueRouter)
 
@@ -21,6 +22,10 @@ export default new VueRouter({
         path: 'save',
         name: 'save',
         component: Save
+      }, {
+        path: 'config',
+        name: 'config',
+        component: Config
       }]
     },
   ]

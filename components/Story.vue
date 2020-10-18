@@ -1,8 +1,8 @@
 <template>
   <div class="story" @mousewheel.prevent ref="story">
-    <audio :src="storyBgmUrl" autoplay="autoplay" loop="loop"></audio>
-    <audio :src="storyText.voiceUrl" autoplay="autoplay"></audio>
-    <audio :src="storySeUrl" autoplay="autoplay"></audio>
+    <audio :src="storyBgmUrl" id="story-bgm" autoplay="autoplay" loop="loop"></audio>
+    <audio :src="storyText.voiceUrl" id="story-voice"  autoplay="autoplay"></audio>
+    <audio :src="storySeUrl" id="story-se" autoplay="autoplay"></audio>
     <img :src="storyFloorUrl" id="story-floor">
     <img :src="storyBg.url" id='story-bg' :style="{
     animationName: storyBg.animationName,
@@ -77,7 +77,6 @@ export default {
         animationDelay: '',
         shakeUp: '',
       },
-
       storyBgmUrl: require('../assets/bgm/bgm01.ogg'),
 
       storyDialogUrl: require('../assets/main2/tip_meswindow_back.png'),
@@ -171,8 +170,19 @@ export default {
     }
   },
 
+
+  updated() {
+    document.getElementById("story-bgm").volume = this.$Global.bgmVolume * 0.01;
+    document.getElementById("story-se").volume = this.$Global.seVolume * 0.01;
+    document.getElementById("story-voice").volume = this.$Global.voiceVolume * 0.01;
+    this.textSpeed = this.$Global.textSpeed
+  },
   mounted() {
     this.storyBackEndText = this.queryNextSentence()
+    document.getElementById("story-bgm").volume = this.$Global.bgmVolume * 0.01;
+    document.getElementById("story-se").volume = this.$Global.seVolume * 0.01;
+    document.getElementById("story-voice").volume = this.$Global.voiceVolume * 0.01;
+    this.textSpeed = this.$Global.textSpeed
   },
 
   methods: {

@@ -3,7 +3,7 @@
   <div class="title" @mousewheel.prevent>
     <!--    ondragstart用于禁止元素拖拽 -->
     <img :src="titleBgUrl" id="title-bg" ondragstart="return false;">
-    <audio :src="titleBgmUrl" autoplay="autoplay" loop="loop"></audio>
+    <audio :src="titleBgmUrl" autoplay="autoplay" loop="loop" ></audio>
     <ul class="title-button-area">
       <li v-for="(item,index) in titleButtonList" @mouseenter="titleOverBtn(item)" @mouseleave="titleOffBtn(item)"
           @click="titleStopBgm(item)">
