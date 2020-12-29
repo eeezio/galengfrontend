@@ -1,7 +1,7 @@
 <template>
   <div class="story" @mousewheel.prevent ref="story">
     <audio :src="storyBgmUrl" id="story-bgm" autoplay="autoplay" loop="loop"></audio>
-    <audio :src="storyText.voiceUrl" id="story-voice"  autoplay="autoplay"></audio>
+    <audio :src="storyText.voiceUrl" id="story-voice" autoplay="autoplay"></audio>
     <audio :src="storySeUrl" id="story-se" autoplay="autoplay"></audio>
     <img :src="storyFloorUrl" id="story-floor">
     <img :src="storyBg.url" id='story-bg' :style="{
@@ -118,9 +118,14 @@ export default {
         },
         {
           btnSrc: [require('../assets/main2/b5_off.png'), require('../assets/main2/b5_on.png')],
+          routeId: 'auto',
+          btnIndex: 0
+        },
+        {
+          btnSrc: [require('../assets/main2/b5_off.png'), require('../assets/main2/b5_on.png')],
           routeId: 'title',
           btnIndex: 0
-        }
+        },
       ],
 
       storyLihuiList: [
@@ -155,7 +160,10 @@ export default {
         }
       ],
 
-      flag: 0,
+      //检测当前是否滚动播完了
+      flag: 1,
+
+      stopAuto: false,
 
       storySaveImgUrl: '',
 
@@ -164,7 +172,8 @@ export default {
       testText: ['计算机科学，研究计算机及其周围各种现象和规律的科学，亦即研究计算机系统结构、程序系统（即软件）、人工智能以及计算本身的性质和问题的学科。',
         '计算机科学是一门包含各种各样与计算和信息处理相关主题的系统学科，从抽象的算法分析、形式化语法等等，到更具体的主题如编程语言、程序设计、软件和硬件等。',
         '计算机科学分为理论计算机科学和实验计算机科学两个部分。后者常称为“计算机科学”而不冠以“实验”二字。',
-        '前者有其他名称，如计算理论、计算机理论、计算机科学基础、计算机科学数学基础等。数学文献中一般指理论计算机科学。'],
+        '前者有其他名称，如计算理论、计算机理论、计算机科学基础、计算机科学数学基础等。数学文献中一般指理论计算机科学。',
+        '麦克风杰克鸟'],
       testCaseMask: [require('../assets/bg/0072.png'), require('../assets/bg/0073.png')],
       testTextIndex: 0,
     }
@@ -177,22 +186,43 @@ export default {
     document.getElementById("story-voice").volume = this.$Global.voiceVolume * 0.01;
     this.textSpeed = this.$Global.textSpeed
   },
+  //钩子函数
   mounted() {
     this.storyBackEndText = this.queryNextSentence()
     document.getElementById("story-bgm").volume = this.$Global.bgmVolume * 0.01;
     document.getElementById("story-se").volume = this.$Global.seVolume * 0.01;
     document.getElementById("story-voice").volume = this.$Global.voiceVolume * 0.01;
     this.textSpeed = this.$Global.textSpeed
+    window.addEventListener("mouseup", this.setAuto);
   },
 
+
   methods: {
+
+
+    sleep(numberMillis) {
+      let now = new Date();
+      let exitTime = now.getTime() + numberMillis;
+      while (true) {
+        now = new Date();
+        if (now.getTime() > exitTime)
+          return;
+      }
+    },
+
+    setAuto() {
+      this.stopAuto = true;
+      console.log(this.stopAuto + "  stopauto")
+    }
+    ,
 
     /**
      * 通过网络请求获取下一句文本
      */
     queryNextSentence() {
       return this.testText[this.testTextIndex++]
-    },
+    }
+    ,
 
 
     /**
@@ -205,12 +235,16 @@ export default {
         this.storyText.immText = this.storyBackEndText;
         this.storyBackEndText = this.queryNextSentence();
       }
+      // if (!this.stopAuto) {
+      //   this.dialogClickCount = 0;
+      // }
       if (this.dialogClickCount % 2 == 1) {
         this.rollNextSentence(0)
       }
       this.flag = 0
       //类似懒加载
-    },
+    }
+    ,
 
     rollNextSentence(i) {
       if (this.dialogClickCount % 2 != 1) {
@@ -222,59 +256,70 @@ export default {
           this.rollNextSentence(i);
         }, this.textSpeed);
       } else {
-        //滚动播完了，可以获取新闻文本了
+        //滚动播完了，可以获取新文本了
         this.flag = 1
         //滚动播完了，下次要滚动开始
         this.dialogClickCount = 0
         //避免刷新成旧的immtext文本
         this.storyText.immText = this.storyBackEndText;
+        if (!this.stopAuto) {
+          this.sleep(1000)
+          this.nextSentence();
+        }
       }
-    },
+    }
+    ,
     /**
      * nextSetence的自己实现版本，深入理解匿名函数中为什么无法用this，函数的立即执行,以及settimeout的调度队列原理
      */
-    // nextSetence(i) {
-    //   let _this = this
-    //   for (i; i <= this.backEndText.length; i++) {
-    //     (function (i) {
-    //         setTimeout(() => {
-    //           _this.showText = _this.backEndText.slice(0, i);
-    //         }, i * 50)
-    //       }
-    //     )(i)
-    //   }
-    // }
+// nextSetence(i) {
+//   let _this = this
+//   for (i; i <= this.backEndText.length; i++) {
+//     (function (i) {
+//         setTimeout(() => {
+//           _this.showText = _this.backEndText.slice(0, i);
+//         }, i * 50)
+//       }
+//     )(i)
+//   }
+// }
 
     resetMask() {
       this.storyMask.animationName = ''
       this.storyMask.animationDuration = ''
       this.storyMask.animationDelay = ''
       this.storyMask.maskUrl = ''
-    },
+    }
+    ,
 
     storyOverBtn(item) {
       item.btnIndex = 1;
-    },
+    }
+    ,
 
     storyOffBtn(item) {
       item.btnIndex = 0;
-    },
+    }
+    ,
 
-    //可保证按按钮时音效正常播放
+//可保证按按钮时音效正常播放
     storyBtnClick(item) {
       let _this = this
       this.storySeUrl = require('../assets/se/0049.ogg')
       setTimeout(() => {
         _this.storySeUrl = ''
       }, 200)
-      if (item.routeId != 'save' && item.routeId != 'title')
+      if (item.routeId != 'save' && item.routeId != 'title' && item.routeId != "auto" && item.routeId != "load") {
         this.$router.push({
           name: item.routeId,
         })
-      else if (item.routeId == 'title') {
+      } else if (item.routeId == "auto") {
+        _this.stopAuto = false;
+        _this.nextSentence();
+      } else if (item.routeId == 'title') {
         this.$emit('playBgm');
         this.$router.go(-1);
-      } else {
+      } else if (item.routeId == "save") {
         let self = this
         //嵌套的异步then，保证进入save界面时图片已经截取完毕
         html2canvas(this.$refs.story).then((canvas) => {
@@ -372,7 +417,7 @@ export default {
 
   width: 100%;
   height: 10%;
-  left: 40%;
+  left: 32%;
   bottom: 0%;
 
   -webkit-user-select: none;
