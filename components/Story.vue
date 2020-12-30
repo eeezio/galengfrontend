@@ -42,7 +42,10 @@
     <!--    test case-->
     <div class="story-dialog-area" @click="nextSentence(),testCase()">
       <img :src=storyDialogUrl ondragstart="return false;">
-      <p v-if="dialogClickCount%2==1" class="story-text">
+      <p v-if="stopAuto==false" class="story-text">
+        {{ storyText.autoText }}
+      </p>
+      <p v-else-if="dialogClickCount%2==1" class="story-text">
         {{ storyText.rollText }}
       </p>
       <p v-else class="story-text">
@@ -87,7 +90,7 @@ export default {
 
       storyFloorUrl: require('../assets/main2/black.png'),
 
-      storyText: {rollText: '', immText: '', voiceUrl: require('../assets/voice/fum_omake_00035.ogg')},
+      storyText: {rollText: '', immText: '', autoText: '', voiceUrl: require('../assets/voice/fum_omake_00035.ogg')},
 
       storyBackEndText: '',
 
@@ -163,7 +166,7 @@ export default {
       //检测当前是否滚动播完了
       flag: 1,
 
-      stopAuto: false,
+      stopAuto: true,
 
       storySaveImgUrl: '',
 
@@ -173,7 +176,11 @@ export default {
         '计算机科学是一门包含各种各样与计算和信息处理相关主题的系统学科，从抽象的算法分析、形式化语法等等，到更具体的主题如编程语言、程序设计、软件和硬件等。',
         '计算机科学分为理论计算机科学和实验计算机科学两个部分。后者常称为“计算机科学”而不冠以“实验”二字。',
         '前者有其他名称，如计算理论、计算机理论、计算机科学基础、计算机科学数学基础等。数学文献中一般指理论计算机科学。',
-        '麦克风杰克鸟'],
+        '麦克风杰克鸟',
+        '计算机科学，研究计算机及其周围各种现象和规律的科学，亦即研究计算机系统结构、程序系统（即软件）、人工智能以及计算本身的性质和问题的学科。',
+        '计算机科学是一门包含各种各样与计算和信息处理相关主题的系统学科，从抽象的算法分析、形式化语法等等，到更具体的主题如编程语言、程序设计、软件和硬件等。',
+        '计算机科学分为理论计算机科学和实验计算机科学两个部分。后者常称为“计算机科学”而不冠以“实验”二字。',
+        '前者有其他名称，如计算理论、计算机理论、计算机科学基础、计算机科学数学基础等。数学文献中一般指理论计算机科学。'],
       testCaseMask: [require('../assets/bg/0072.png'), require('../assets/bg/0073.png')],
       testTextIndex: 0,
     }
@@ -212,7 +219,6 @@ export default {
 
     setAuto() {
       this.stopAuto = true;
-      console.log(this.stopAuto + "  stopauto")
     }
     ,
 
@@ -229,16 +235,17 @@ export default {
      * 展示下一句游戏文本
      */
     nextSentence() {
+
       this.dialogClickCount += 1
       //滚动播完或者当前是立即显示，即可获取下一条文本
       if (this.flag == 1 || this.dialogClickCount % 2 == 0) {
         this.storyText.immText = this.storyBackEndText;
         this.storyBackEndText = this.queryNextSentence();
       }
-      // if (!this.stopAuto) {
-      //   this.dialogClickCount = 0;
-      // }
-      if (this.dialogClickCount % 2 == 1) {
+      if (!this.stopAuto) {
+        this.autoNextSentence(0);
+      }
+      if (this.dialogClickCount % 2 == 1 && this.stopAuto) {
         this.rollNextSentence(0)
       }
       this.flag = 0
@@ -258,12 +265,29 @@ export default {
       } else {
         //滚动播完了，可以获取新文本了
         this.flag = 1
-        //滚动播完了，下次要滚动开始
-        this.dialogClickCount = 0
         //避免刷新成旧的immtext文本
         this.storyText.immText = this.storyBackEndText;
+        //滚动播完了，下次要滚动开始
+        this.dialogClickCount = 0
+      }
+    }
+    ,
+
+    autoNextSentence(i) {
+      if (i <= this.storyBackEndText.length) {
+        this.storyText.autoText = this.storyBackEndText.slice(0, i++);
+        setTimeout(() => {
+          this.autoNextSentence(i);
+        }, this.textSpeed);
+      } else {
+        //滚动播完了，可以获取新文本了
+        this.flag = 1
+        //避免刷新成旧的immtext文本
+        this.storyText.immText = this.storyBackEndText;
+        //滚动播完了，下次要滚动开始
+        this.dialogClickCount = 0
         if (!this.stopAuto) {
-          this.sleep(1000)
+          this.sleep(1000);
           this.nextSentence();
         }
       }
@@ -315,6 +339,7 @@ export default {
         })
       } else if (item.routeId == "auto") {
         _this.stopAuto = false;
+        _this.flag = 1;
         _this.nextSentence();
       } else if (item.routeId == 'title') {
         this.$emit('playBgm');
