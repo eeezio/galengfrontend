@@ -10,6 +10,7 @@ import Global from "./components/Global";
 Vue.use(ElementUI)
 Vue.config.productionTip = false
 Vue.prototype.$Global = Global
+// Vue.forceUpdate()
 
 /* eslint-disable no-new */
 new Vue({

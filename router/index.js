@@ -5,6 +5,8 @@ import Story from "../components/Story";
 import Log from "../components/Log";
 import Save from "../components/Save";
 import Config from "../components/Config";
+import Load from "../components/Load";
+import Cg from "../components/Cg";
 
 Vue.use(VueRouter)
 
@@ -26,7 +28,20 @@ export default new VueRouter({
         path: 'config',
         name: 'config',
         component: Config
-      }]
-    },
+      }, {
+        path: 'load',
+        name: 'load',
+        component: Load
+      },
+      ]
+    }, {
+      path: '/loadtitle',
+      name: 'loadtitle',
+      component: Load
+    }, {
+      path: '/cg',
+      name: 'cg',
+      component: Cg
+    }
   ]
 })

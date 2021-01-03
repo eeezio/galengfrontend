@@ -70,7 +70,6 @@ import html2canvas from 'html2canvas'
 
 export default {
   name: "Story",
-
   data() {
     return {
       storyBg: {
@@ -125,7 +124,7 @@ export default {
           btnIndex: 0
         },
         {
-          btnSrc: [require('../assets/main2/b5_off.png'), require('../assets/main2/b5_on.png')],
+          btnSrc: [require('../assets/saveload/btn_page06_off.png'), require('../assets/saveload/btn_page06_on.png')],
           routeId: 'title',
           btnIndex: 0
         },
@@ -333,7 +332,7 @@ export default {
       setTimeout(() => {
         _this.storySeUrl = ''
       }, 200)
-      if (item.routeId != 'save' && item.routeId != 'title' && item.routeId != "auto" && item.routeId != "load") {
+      if (item.routeId != 'save' && item.routeId != 'title' && item.routeId != "auto" ) {
         this.$router.push({
           name: item.routeId,
         })

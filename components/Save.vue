@@ -2,7 +2,7 @@
   <div class="save" @mousewheel.prevent>
     <img :src="saveBgUrl" id="save-bg" ondragstart="return false;">
     <div class="save-area">
-      <div v-for="(item,index) in saveBtnContext" class="save-button" @click="saveData(index)">
+      <div v-for="(item,index) in this.$Global.saveBtnContext" class="save-button" @click="saveData(index)">
         <img :src="saveBtnUrl">
         <img class="save-data-image" v-if="item.image!=''" :src="item.image">
         <p class="save-text" v-if="item.haveData==1">{{ item.saveText }}</p>
@@ -30,46 +30,6 @@ export default {
       },
       saveText: '',
       saveImage: '',
-      saveBtnContext: [{
-        haveData: 0,
-        image: '',
-        saveText: ''
-      },
-        {
-          haveData: 0,
-          image: '',
-          saveText: ''
-        },
-        {
-          haveData: 0,
-          image: '',
-          saveText: ''
-        },
-        {
-          haveData: 0,
-          image: '',
-          saveText: ''
-        },
-        {
-          haveData: 0,
-          image: '',
-          saveText: ''
-        },
-        {
-          haveData: 0,
-          image: '',
-          saveText: ''
-        },
-        {
-          haveData: 0,
-          image: '',
-          saveText: ''
-        },
-        {
-          haveData: 0,
-          image: '',
-          saveText: ''
-        },],
     }
   },
 
@@ -77,14 +37,16 @@ export default {
     saveData(i) {
       this.saveText = this.$route.params.saveText
       this.saveImage = this.$route.params.saveImage
-      this.saveBtnContext[i].haveData = 1
       if (this.saveText.length >= 10) {
-        this.saveBtnContext[i].saveText = this.saveText.slice(0, 20)
-        this.saveBtnContext[i].saveText += '...'
+        this.$Global.saveBtnContext[i].saveText = this.saveText.slice(0, 20)
+        this.$Global.saveBtnContext[i].saveText += '...'
       } else {
-        this.saveBtnContext[i].saveText = this.saveText
+        this.$Global.saveBtnContext[i].saveText = this.saveText
       }
-      this.saveBtnContext[i].image = this.saveImage
+      this.$Global.saveBtnContext[i].image = this.saveImage
+      this.$Global.saveBtnContext[i].haveData = 1
+      //强制页面渲染
+      this.$forceUpdate()
     },
 
     saveOverBtn() {

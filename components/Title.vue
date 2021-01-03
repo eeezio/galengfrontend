@@ -3,20 +3,19 @@
   <div class="title" @mousewheel.prevent>
     <!--    ondragstart用于禁止元素拖拽 -->
     <img :src="titleBgUrl" id="title-bg" ondragstart="return false;">
-    <audio :src="titleBgmUrl" autoplay="autoplay" loop="loop" ></audio>
+    <audio :src="titleBgmUrl" autoplay="autoplay" loop="loop"></audio>
     <ul class="title-button-area">
-      <li v-for="(item,index) in titleButtonList" @mouseenter="titleOverBtn(item)" @mouseleave="titleOffBtn(item)"
-          @click="titleStopBgm(item)">
+      <li v-for="(item,index) in titleButtonList" @mouseenter="titleOverBtn(item)" @mouseleave="titleOffBtn(item)">
 
         <!--        <router-link :to=item.routeId  v-on:playBgm="storyToTitle">-->
-        <img :src="item.btnSrc[item.btnIndex]" ondragstart="return false;">
+        <img :src="item.btnSrc[item.btnIndex]" ondragstart="return false;" @click="titleStopBgm(item)">
         <!--        </router-link>-->
       </li>
     </ul>
     <!--    vue提供的过渡操作-->
-    <!--    <transition name="component-fade" mode="out-in">-->
-    <router-view></router-view>
-    <!--    </transition>-->
+    <transition name="component-fade" mode="out-in">
+      <router-view></router-view>
+    </transition>
   </div>
 </template>
 <script>
@@ -35,22 +34,13 @@ export default {
         btnIndex: 0
       }, {
         btnSrc: [require('../assets/title/btn_load01_off.png'), require('../assets/title/btn_load01_over.png')],
-        routeId: "/load",
+        routeId: "loadtitle",
         btnIndex: 0
       }, {
         btnSrc: [require('../assets/title/btn_cgmode01_off.png'), require('../assets/title/btn_cgmode01_over.png')],
-        routeId: "/cg",
-        btnIndex: 0
-      }, {
-        btnSrc: [require('../assets/title/btn_config01_off.png'), require('../assets/title/btn_config01_over.png')],
-        routeId: "/setting",
+        routeId: "cg",
         btnIndex: 0
       },
-        {
-          btnSrc: [require('../assets/title/btn_end01_off.png'), require('../assets/title/btn_end01_over.png')],
-          routeId: "/end",
-          btnIndex: 0
-        }
       ]
     }
   },
@@ -81,7 +71,9 @@ export default {
      * 停止标题音乐
      */
     titleStopBgm: function (item) {
-      this.titleBgmUrl = ''
+      if (item.routeId == "story") {
+        this.titleBgmUrl = ''
+      }
       this.$router.push(({
         name: item.routeId,
       }))
