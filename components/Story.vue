@@ -40,7 +40,7 @@
       </li>
     </ul>
     <!--    test case-->
-    <div class="story-dialog-area" @click="nextSentence(),testCase()">
+    <div v-if="storyMode==true" class="story-dialog-area" @click="nextSentence(),testCase()">
       <img :src=storyDialogUrl ondragstart="return false;">
       <p v-if="stopAuto==false" class="story-text">
         {{ storyText.autoText }}
@@ -58,6 +58,14 @@
         <!--        <router-link :to=item.routeId @click="storyBtnClick">-->
         <img :src="item.btnSrc[item.btnIndex]" @click="storyBtnClick(item)" ondragstart="return false;">
         <!--        </router-link>-->
+      </li>
+    </ul>
+    <ul v-if="selectMode" class="select-button-area">
+      <li v-for="(item,index) in selectBtnList" @mouseenter="storyOverBtn(item)" @mouseleave="storyOffBtn(item)"  @click="selectBtnClick(index)">
+        <img :src="item.btnSrc[item.btnIndex]" ondragstart="return false;">
+        <p class="select-text">
+          {{ item.selectText }}
+        </p>
       </li>
     </ul>
     <router-view></router-view>
@@ -162,6 +170,22 @@ export default {
         }
       ],
 
+      selectBtnList: [
+        {
+          selectText: "大家好",
+          btnIndex: 0,
+          btnSrc: [require("../assets/select/btn_select_off.png"), require("../assets/select/btn_select_over.png")]
+        }, {
+          selectText: "欢迎大家陪我",
+          btnIndex: 0,
+          btnSrc: [require("../assets/select/btn_select_off.png"), require("../assets/select/btn_select_over.png")]
+        }, {
+          selectText: "继续重修大学计算机",
+          btnIndex: 0,
+          btnSrc: [require("../assets/select/btn_select_off.png"), require("../assets/select/btn_select_over.png")]
+        }
+      ],
+
       //检测当前是否滚动播完了
       flag: 1,
 
@@ -169,7 +193,11 @@ export default {
 
       storySaveImgUrl: '',
 
+      storyMode: false,
 
+      selectMode: true,
+
+      //index为没用的测试变量，将来一定要删掉
       index: 0,
       testText: ['计算机科学，研究计算机及其周围各种现象和规律的科学，亦即研究计算机系统结构、程序系统（即软件）、人工智能以及计算本身的性质和问题的学科。',
         '计算机科学是一门包含各种各样与计算和信息处理相关主题的系统学科，从抽象的算法分析、形式化语法等等，到更具体的主题如编程语言、程序设计、软件和硬件等。',
@@ -204,7 +232,10 @@ export default {
 
 
   methods: {
-
+//TODO
+    selectBtnClick(index) {
+      console.log(index)
+    },
 
     sleep(numberMillis) {
       let now = new Date();
@@ -234,7 +265,6 @@ export default {
      * 展示下一句游戏文本
      */
     nextSentence() {
-
       this.dialogClickCount += 1
       //滚动播完或者当前是立即显示，即可获取下一条文本
       if (this.flag == 1 || this.dialogClickCount % 2 == 0) {
@@ -332,7 +362,7 @@ export default {
       setTimeout(() => {
         _this.storySeUrl = ''
       }, 200)
-      if (item.routeId != 'save' && item.routeId != 'title' && item.routeId != "auto" ) {
+      if (item.routeId != 'save' && item.routeId != 'title' && item.routeId != "auto") {
         this.$router.push({
           name: item.routeId,
         })
@@ -462,6 +492,55 @@ li {
   float: left;
 
   list-style: none;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.select-button-area {
+  position: absolute;
+
+  width: 100%;
+  height: 80%;
+  left: 8%;
+  bottom: 25%;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  /*border-style: solid;*/
+  /*border-color: red;*/
+}
+
+.select-button-area
+li {
+  position: relative;
+
+  bottom: -50%;
+  padding-right: 5%;
+  float: left;
+
+  list-style: none;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.select-text {
+  position: absolute;
+
+  top: -20%;
+  left: 10%;
+  right: 10%;
+
+  font-size: 25px;
+  color: aliceblue;
 
   -webkit-user-select: none;
   -moz-user-select: none;
