@@ -1,12 +1,13 @@
 <template>
   <div class="cg" @mousewheel.prevent>
+    <img :src="showCgList[showCgPage]" id="show-cg" @click="showCg()">
     <img :src="cgBgUrl" id="cg-bg" ondragstart="return false;">
-    <div class="cg-area">
-      <div v-for="(item,index) in this.$Global.cgBtnContext" class="cg-image">
-        <img class="cg-image-data" v-if="item.pageId==currentPage" :src="item.image" @click="showCg(item)">
+    <div v-if="!showCgmode" class="cg-area">
+      <div v-for="(item,index) in this.cgImagePage" class="cg-image">
+        <img class="cg-image-data" :src="item.image" @click="setCg(item)">
       </div>
     </div>
-    <ul class="cg-button-area">
+    <ul v-if="!showCgmode" class="cg-button-area">
       <li v-for="(item,index) in cgButtonList" @mouseenter="cgOverBtn(item)" @mouseleave="cgOffBtn(item)">
         <img :src="item.btnSrc[item.btnIndex]" @click="cgBtnClick(index)" ondragstart="return false;">
       </li>
@@ -22,6 +23,7 @@ export default {
     return {
       cgBgUrl: require("../assets/cg/back.png"),
       currentPage: 1,
+
       cgButtonList: [{
         btnSrc: [require('../assets/main2/b1_off.png'), require('../assets/main2/b1_on.png')],
         btnIndex: 0
@@ -33,21 +35,40 @@ export default {
         {
           btnSrc: [require('../assets/saveload/btn_back_off.png'), require('../assets/saveload/btn_back_on.png')],
           btnIndex: 0
-        },]
+        },],
+
+      cgImagePage: this.$Global.cgBtnContext[0].cgInfo,
+
+      showCgList: "",
+      showCgNum: 0,
+      showCgPage: 0,
+      showCgmode: false
     }
   },
 
   methods: {
-    showCg(item) {
+    setCg(item) {
       if (item.haveData == false) {
         return;
       } else {
-
+        this.showCgmode = true
+        this.showCgList = item.realCgUrl
+        this.showCgNum = item.cgNum
+      }
+    },
+    showCg() {
+      this.showCgPage += 1
+      if (this.showCgPage == this.showCgNum) {
+        this.showCgList = [];
+        this.showCgNum = 0;
+        this.showCgPage = 0;
+        this.showCgmode = false
       }
     },
     cgBtnClick(index) {
       if (index <= 1) {
         this.currentPage = index + 1;
+        this.cgImagePage=this.$Global.cgBtnContext[index].cgInfo
         this.$forceUpdate()
       } else {
         this.$router.go(-1)
@@ -64,6 +85,12 @@ export default {
 </script>
 
 <style scoped>
+#show-cg {
+  position: absolute;
+  margin: -1%;
+  padding: -1%;
+}
+
 .cg {
   position: absolute;
 

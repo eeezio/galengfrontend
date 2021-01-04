@@ -53,100 +53,106 @@ export default {
     },],
 
   cgBtnContext: [{
-    realCgUrl: '',
-    image: require("../assets/cg/btn_plate_back_off.png"),
     pageId: 1,
-    haveData: false
-  },
-    {
+    cgInfo: [{
       realCgUrl: '',
       image: require("../assets/cg/btn_plate_back_off.png"),
-      pageId: 1,
+      cgNum: '',
       haveData: false
     },
-    {
-      realCgUrl: '',
-      image: require("../assets/cg/btn_plate_back_off.png"),
-      pageId: 1,
-      haveData: false
-    },
-    {
-      realCgUrl: '',
-      image: require("../assets/cg/btn_plate_back_off.png"),
-      pageId: 1,
-      haveData: false
-    },
-    {
-      realCgUrl: '',
-      image: require("../assets/cg/btn_plate_back_off.png"),
-      pageId: 1,
-      haveData: false
-    },
-    {
-      realCgUrl: '',
-      image: require("../assets/cg/btn_plate_back_off.png"),
-      pageId: 1,
-      haveData: false
-    },
-    {
-      realCgUrl: '',
-      image: require("../assets/cg/btn_plate_back_off.png"),
-      pageId: 1,
-      haveData: false
-    },
-    {
-      realCgUrl: '',
-      image: require("../assets/cg/btn_plate_back_off.png"),
-      pageId: 1,
-      haveData: false
-    }, {
-      realCgUrl: [],
+      {
+        realCgUrl: '',
+        image: require("../assets/cg/btn_plate_back_off.png"),
+        cgNum: '',
+        haveData: false
+      },
+      {
+        realCgUrl: '',
+        image: require("../assets/cg/btn_plate_back_off.png"),
+        cgNum: '',
+        haveData: false
+      },
+      {
+        realCgUrl: '',
+        image: require("../assets/cg/btn_plate_back_off.png"),
+        cgNum: '',
+        haveData: false
+      },
+      {
+        realCgUrl: '',
+        image: require("../assets/cg/btn_plate_back_off.png"),
+        cgNum: '',
+        haveData: false
+      },
+      {
+        realCgUrl: '',
+        image: require("../assets/cg/btn_plate_back_off.png"),
+        cgNum: '',
+        haveData: false
+      },
+      {
+        realCgUrl: '',
+        image: require("../assets/cg/btn_plate_back_off.png"),
+        cgNum: '',
+        haveData: false
+      },
+      {
+        realCgUrl: '',
+        image: require("../assets/cg/btn_plate_back_off.png"),
+        cgNum: '',
+        haveData: false
+      }]
+  }, {
+    pageId: 2, cgInfo: [{
+      realCgUrl: [require("../assets/cg/ev102.png"), require("../assets/cg/ev102_1.png")],
       image: require("../assets/cg/ev102_little.png"),
-      pageId: 2,
+      cgNum: 2,
       haveData: true
     },
-    {
-      realCgUrl: '',
-      image: require("../assets/cg/btn_plate_back_off.png"),
-      pageId: 2,
-      haveData: false
-    },
-    {
-      realCgUrl: '',
-      image: require("../assets/cg/btn_plate_back_off.png"),
-      pageId: 2,
-      haveData: false
-    },
-    {
-      realCgUrl: '',
-      image: require("../assets/cg/btn_plate_back_off.png"),
-      pageId: 2,
-      haveData: false
-    },
-    {
-      realCgUrl: '',
-      image: require("../assets/cg/btn_plate_back_off.png"),
-      pageId: 2,
-      haveData: false
-    },
-    {
-      realCgUrl: '',
-      image: require("../assets/cg/btn_plate_back_off.png"),
-      pageId: 2,
-      haveData: false
-    },
-    {
-      realCgUrl: '',
-      image: require("../assets/cg/btn_plate_back_off.png"),
-      pageId: 2,
-      haveData: false
-    },
-    {
-      realCgUrl: '',
-      image: require("../assets/cg/btn_plate_back_off.png"),
-      pageId: 2,
-      haveData: false
-    },],
+      {
+        realCgUrl: '',
+        image: require("../assets/cg/btn_plate_back_off.png"),
+        cgNum: '',
+        haveData: false
+      },
+      {
+        realCgUrl: '',
+        image: require("../assets/cg/btn_plate_back_off.png"),
+        cgNum: '',
+        haveData: false
+      },
+      {
+        realCgUrl: '',
+        image: require("../assets/cg/btn_plate_back_off.png"),
+        cgNum: '',
+        haveData: false
+      },
+      {
+        realCgUrl: '',
+        image: require("../assets/cg/btn_plate_back_off.png"),
+        cgNum: '',
+        haveData: false
+      },
+      {
+        realCgUrl: '',
+        image: require("../assets/cg/btn_plate_back_off.png"),
+        cgNum: '',
+        haveData: false
+      },
+      {
+        realCgUrl: '',
+        image: require("../assets/cg/btn_plate_back_off.png"),
+        cgNum: '',
+        haveData: false
+      },
+      {
+        realCgUrl: '',
+        image: require("../assets/cg/btn_plate_back_off.png"),
+        cgNum: '',
+        haveData: false
+      }]
+  },
+  ],
 }
 </script>
 
