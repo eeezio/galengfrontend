@@ -3,24 +3,17 @@
     <audio :src="storyBgmUrl" id="story-bgm" autoplay="autoplay" loop="loop"></audio>
     <audio :src="storyText.voiceUrl" id="story-voice" autoplay="autoplay"></audio>
     <audio :src="storySeUrl" id="story-se" autoplay="autoplay"></audio>
-    <img :src="storyFloorUrl" id="story-floor">
+    <!--    crossorigin="anonymous" 为了解决跨域问题-->
+    <img :src="storyFloorUrl" id="story-floor" crossorigin="anonymous">
     <img :src="storyBg.url" id='story-bg' :style="{
     animationName: storyBg.animationName,
     animationDuration: storyBg.animationDuration,
     animationDelay: storyBg.animationDelay,
     //css变量在vue中使用这种方式与data绑定
     '--shake-up':storyBg.shakeUp,
-    }" ondragstart="return false;">
-    <img :src="storyMask.maskUrl" id="story-mask" :style="{
-         animationName: storyMask.animationName,
-         animationDuration: storyMask.animationDuration,
-         animationDelay: storyMask.animationDelay,
-         animationFillMode: 'forwards'
-         }"
-         ondragstart="return false;">
-    }
+    }" ondragstart="return false;" crossorigin="anonymous">
     <ul class="story-lihui-area">
-      <li v-for="(item,index) in storyLihuiList" :class="item.class" :style="{
+      <li v-for="(item,index) in storyLihuiList" :style="{
           position: 'relative',
           height: '100%',
           width: '19%',
@@ -36,12 +29,12 @@
           '--right-move':item.rightMove,
           '--left-move':item.leftMove
           }">
-        <img :src="item.lihuiSrc" ondragstart="return false;">
+        <img :src="item.lihuiSrc" ondragstart="return false;" crossorigin="anonymous">
       </li>
     </ul>
     <!--    test case-->
-    <div v-if="storyMode==true" class="story-dialog-area" @click="nextSentence(),testCase()">
-      <img :src=storyDialogUrl ondragstart="return false;">
+    <div v-if="storyMode==true" class="story-dialog-area" @click="nextInstruct(),testCase()">
+      <img :src=storyDialogUrl ondragstart="return false;" crossorigin="anonymous">
       <p v-if="stopAuto==false" class="story-text">
         {{ storyText.autoText }}
       </p>
@@ -60,8 +53,16 @@
         <!--        </router-link>-->
       </li>
     </ul>
+    <img :src="storyMask.maskUrl" id="story-mask" :style="{
+         animationName: storyMask.animationName,
+         animationDuration: storyMask.animationDuration,
+         animationDelay: storyMask.animationDelay,
+         animationFillMode: 'forwards'
+         }"
+         ondragstart="return false;">
     <ul v-if="selectMode" class="select-button-area">
-      <li v-for="(item,index) in selectBtnList" @mouseenter="storyOverBtn(item)" @mouseleave="storyOffBtn(item)"  @click="selectBtnClick(index)">
+      <li v-for="(item,index) in selectBtnList" @mouseenter="storyOverBtn(item)" @mouseleave="storyOffBtn(item)"
+          @click="selectBtnClick(index)">
         <img :src="item.btnSrc[item.btnIndex]" ondragstart="return false;">
         <p class="select-text">
           {{ item.selectText }}
@@ -80,28 +81,43 @@ export default {
   name: "Story",
   data() {
     return {
+      // storyBg: {
+      //   url: require('../assets/bg/0229.png'),
+      //   animationName: null,
+      //   animationDuration: null,
+      //   animationDelay: null,
+      //   shakeUp: null,
+      // },
+      // storyBgmUrl: require('../assets/bgm/bgm01.ogg'),
+      //
+      // storyDialogUrl: require('../assets/main2/tip_meswindow_back.png'),
+      //
+      // storySeUrl: require('../assets/se/0001.ogg'),
+
       storyBg: {
-        url: require('../assets/bg/0229.png'),
-        animationName: '',
-        animationDuration: '',
-        animationDelay: '',
-        shakeUp: '',
+        url: null,
+        animationName: null,
+        animationDuration: null,
+        animationDelay: null,
+        shakeUp: null,
       },
-      storyBgmUrl: require('../assets/bgm/bgm01.ogg'),
 
-      storyDialogUrl: require('../assets/main2/tip_meswindow_back.png'),
+      storyBgmUrl: null,
 
-      storySeUrl: require('../assets/se/0001.ogg'),
+      storyDialogUrl: null,
 
-      storyMask: {maskUrl: '', animationName: '', animationDelay: '', animationDuration: ''},
+      storySeUrl: null,
+
+      storyMask: {maskUrl: null, animationName: null, animationDelay: null, animationDuration: null},
 
       storyFloorUrl: require('../assets/main2/black.png'),
 
-      storyText: {rollText: '', immText: '', autoText: '', voiceUrl: require('../assets/voice/fum_omake_00035.ogg')},
+      // storyText: {rollText: null, immText: null, autoText: null, voiceUrl: require('../assets/voice/fum_omake_00035.ogg')},
+      storyText: {rollText: null, immText: null, autoText: null, voiceUrl: null},
 
-      storyBackEndText: '',
+      storyBackEndText: null,
 
-      textSpeed: 30,
+      textSpeed: 60,//这个应该从global处获取
 
       dialogClickCount: 0,
 
@@ -140,33 +156,70 @@ export default {
 
       storyLihuiList: [
         {
-          lihuiSrc: require('../assets/lihui/0132.png'),
-          animationName: '',
-          animationDuration: '',
-          animationDelay: '',
-          jumpUp: '',
-          rightMove: '',
-          leftMove: ''
+          // lihuiSrc: require('../assets/lihui/0132.png'),
+          // animationName: null,
+          // animationDuration: null,
+          // animationDelay: null,
+          // jumpUp: null,
+          // rightMove: null,
+          // leftMove: null
+          lihuiSrc: null,
+          animationName: null,
+          animationDuration: null,
+          animationDelay: null,
+          jumpUp: null,
+          rightMove: null,
+          leftMove: null
         },
-        {lihuiSrc: ''},
         {
-          lihuiSrc: require('../assets/lihui/0320.png'),
-          animationName: 'jump-up,jump-down',
-          animationDuration: '0.3s,0.3s',
-          animationDelay: '0s,0.3s',
-          jumpUp: '10%',
-          rightMove: '20%',
-          leftMove: ''
+          lihuiSrc: null,
+          animationName: null,
+          animationDuration: null,
+          animationDelay: null,
+          jumpUp: null,
+          rightMove: null,
+          leftMove: null
         },
-        {lihuiSrc: '', class: "normal"},
         {
-          lihuiSrc: require('../assets/lihui/0445.png'),
-          animationName: '',
-          animationDuration: '',
-          animationDelay: '',
-          jumpUp: '',
-          rightMove: '',
-          leftMove: ''
+          // lihuiSrc: require('../assets/lihui/0320.png'),
+          // animationName: 'jump-up,jump-down',
+          // animationDuration: '0.3s,0.3s',
+          // animationDelay: '0s,0.3s',
+          // jumpUp: '10%',
+          // rightMove: '20%',
+          // leftMove: null
+          lihuiSrc: null,
+          animationName: null,
+          animationDuration: null,
+          animationDelay: null,
+          jumpUp: null,
+          rightMove: null,
+          leftMove: null
+        },
+        {
+          lihuiSrc: null,
+          animationName: null,
+          animationDuration: null,
+          animationDelay: null,
+          jumpUp: null,
+          rightMove: null,
+          leftMove: null
+        },
+        {
+          // lihuiSrc: require('../assets/lihui/0445.png'),
+          // animationName: null,
+          // animationDuration: null,
+          // animationDelay: null,
+          // jumpUp: null,
+          // rightMove: null,
+          // leftMove: null
+          lihuiSrc: null,
+          animationName: null,
+          animationDuration: null,
+          animationDelay: null,
+          jumpUp: null,
+          rightMove: null,
+          leftMove: null
         }
       ],
 
@@ -191,11 +244,11 @@ export default {
 
       stopAuto: true,
 
-      storySaveImgUrl: '',
+      storySaveImgUrl: null,
 
-      storyMode: false,
+      storyMode: true,
 
-      selectMode: true,
+      selectMode: false,
 
       //index为没用的测试变量，将来一定要删掉
       index: 0,
@@ -213,7 +266,6 @@ export default {
     }
   },
 
-
   updated() {
     document.getElementById("story-bgm").volume = this.$Global.bgmVolume * 0.01;
     document.getElementById("story-se").volume = this.$Global.seVolume * 0.01;
@@ -222,12 +274,29 @@ export default {
   },
   //钩子函数
   mounted() {
-    this.storyBackEndText = this.queryNextSentence()
     document.getElementById("story-bgm").volume = this.$Global.bgmVolume * 0.01;
     document.getElementById("story-se").volume = this.$Global.seVolume * 0.01;
     document.getElementById("story-voice").volume = this.$Global.voiceVolume * 0.01;
     this.textSpeed = this.$Global.textSpeed
+    let runtimeSave = this.$route.params.runtimeSave
+    let lihuiSave = this.$route.params.lihuiSave
     window.addEventListener("mouseup", this.setAuto);
+    this.storyBackEndText = runtimeSave.storyText
+    this.storyMode = runtimeSave.storyMode
+    this.selectMode = runtimeSave.selectMode
+    this.storyText.voiceUrl = runtimeSave.storyVoiceUrl
+    this.storySeUrl = runtimeSave.storySeUrl
+    this.storyDialogUrl = runtimeSave.storyDialogUrl
+    this.storyBgmUrl = runtimeSave.storyBgmUrl
+    this.storyBg.url = runtimeSave.storyBgUrl
+    this.storyBg.shakeUp = runtimeSave.storyBgShakeUp
+    this.storyBg.animationDuration = runtimeSave.storyBgAnimationDuration
+    this.storyBg.animationDelay = runtimeSave.storyBgAnimationDelay
+    this.storyBg.animationName = runtimeSave.storyBgAnimationName
+    for (let j = 0; j < lihuiSave.length; j++) {
+      this.storyLihuiList[lihuiSave[j].lihuiId] = lihuiSave[j]
+    }
+    this.nextInstruct()
   },
 
 
@@ -264,7 +333,7 @@ export default {
     /**
      * 展示下一句游戏文本
      */
-    nextSentence() {
+    nextInstruct() {
       this.dialogClickCount += 1
       //滚动播完或者当前是立即显示，即可获取下一条文本
       if (this.flag == 1 || this.dialogClickCount % 2 == 0) {
@@ -317,7 +386,7 @@ export default {
         this.dialogClickCount = 0
         if (!this.stopAuto) {
           this.sleep(1000);
-          this.nextSentence();
+          this.nextInstruct();
         }
       }
     }
@@ -338,10 +407,10 @@ export default {
 // }
 
     resetMask() {
-      this.storyMask.animationName = ''
-      this.storyMask.animationDuration = ''
-      this.storyMask.animationDelay = ''
-      this.storyMask.maskUrl = ''
+      this.storyMask.animationName = null
+      this.storyMask.animationDuration = null
+      this.storyMask.animationDelay = null
+      this.storyMask.maskUrl = null
     }
     ,
 
@@ -360,7 +429,7 @@ export default {
       let _this = this
       this.storySeUrl = require('../assets/se/0049.ogg')
       setTimeout(() => {
-        _this.storySeUrl = ''
+        _this.storySeUrl = null
       }, 200)
       if (item.routeId != 'save' && item.routeId != 'title' && item.routeId != "auto") {
         this.$router.push({
@@ -369,15 +438,19 @@ export default {
       } else if (item.routeId == "auto") {
         _this.stopAuto = false;
         _this.flag = 1;
-        _this.nextSentence();
+        _this.nextInstruct();
       } else if (item.routeId == 'title') {
         this.$emit('playBgm');
-        this.$router.go(-1);
+        // this.$router.go(-1);
+        this.$router.push({name: "title"})
       } else if (item.routeId == "save") {
         let self = this
-        //嵌套的异步then，保证进入save界面时图片已经截取完毕
-        html2canvas(this.$refs.story).then((canvas) => {
-            let dataURL = canvas.toDataURL("image/jpeg", 0.1)
+        //嵌套的异步then，保证进入save界面时图片已经截取完毕,allowTaint和useCORS为了解决跨域
+        html2canvas(this.$refs.story, {
+          allowTaint: false,
+          useCORS: true
+        }).then((canvas) => {
+            let dataURL = canvas.toDataURL("image/png", 0.1)
             self.storySaveImgUrl = dataURL
           }
         ).then(() => {
@@ -386,6 +459,19 @@ export default {
             params: {
               saveText: this.storyText.immText,
               saveImage: this.storySaveImgUrl,
+              storyBgmUrl: this.storyBgmUrl,
+              storyDialogUrl: this.storyDialogUrl,
+              storySeUrl: this.storySeUrl,
+              storyText: this.storyBackEndText,
+              storyVoiceUrl: this.storyText.voiceUrl,
+              storyMode: this.storyMode,
+              selectMode: this.selectMode,
+              storyBgUrl: this.storyBg.url,
+              storyBgAnimationName: this.storyBg.animationName,
+              storyBgAnimationDelay: this.storyBg.animationDelay,
+              storyBgAnimationDuration: this.storyBg.animationDuration,
+              storyBgShakeUp: this.storyBg.shakeUp,
+              storyLihuiList: this.storyLihuiList
             }
           })
         })
@@ -404,7 +490,7 @@ export default {
       this.storyLihuiList[0].animationDuration = '0.5s,0.5s'
       this.storyLihuiList[0].rightMove = '20%'
       this.storyLihuiList[0].leftMove = '0'
-      this.storyText.voiceUrl = require('../assets/voice/fum_omake_00036.ogg')
+      // this.storyText.voiceUrl = require('../assets/voice/fum_omake_00036.ogg')
 
       let temp = this.index
       this.storyMask.maskUrl = this.testCaseMask[temp]

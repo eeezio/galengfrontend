@@ -22,7 +22,6 @@ export default {
   data() {
     return {
       cgBgUrl: require("../assets/cg/back.png"),
-      currentPage: 1,
 
       cgButtonList: [{
         btnSrc: [require('../assets/main2/b1_off.png'), require('../assets/main2/b1_on.png')],
@@ -67,7 +66,6 @@ export default {
     },
     cgBtnClick(index) {
       if (index <= 1) {
-        this.currentPage = index + 1;
         this.cgImagePage=this.$Global.cgBtnContext[index].cgInfo
         this.$forceUpdate()
       } else {

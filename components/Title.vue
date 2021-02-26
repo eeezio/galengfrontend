@@ -8,7 +8,7 @@
       <li v-for="(item,index) in titleButtonList" @mouseenter="titleOverBtn(item)" @mouseleave="titleOffBtn(item)">
 
         <!--        <router-link :to=item.routeId  v-on:playBgm="storyToTitle">-->
-        <img :src="item.btnSrc[item.btnIndex]" ondragstart="return false;" @click="titleStopBgm(item)">
+        <img :src="item.btnSrc[item.btnIndex]" ondragstart="return false;" @click="startStory(item)">
         <!--        </router-link>-->
       </li>
     </ul>
@@ -19,6 +19,8 @@
   </div>
 </template>
 <script>
+import axios from "axios";
+
 export default {
   name: "Title",
 
@@ -49,9 +51,38 @@ export default {
     $route(to, from) {
       if (to.path == '/') {
         this.titleBgmUrl = require('../assets/bgm/bgm17.ogg');
+      } else if (to.path == '/story') {
+        this.titleStopBgm()
       }
     }
   },
+
+  mounted() {
+    axios.get("http://localhost:8080/selectSnapshootSave" + '/' + 'root' + '/' + 'galeng').then((response) => {
+      for (let j = 0; j < response.data.length; j++) {
+        let snapShootData = this.$Global.saveBtnContext[response.data[j].savePage].saveInfo[response.data[j].saveId]
+        snapShootData.image = response.data[j].image
+        snapShootData.haveData = true
+        snapShootData.saveText = response.data[j].saveText
+      }
+    })
+    axios.get("http://localhost:8080/selectCg" + '/' + 'root' + '/' + 'galeng').then((response) => {
+      let cgData = this.$Global.cgBtnContext
+      for (let j = 0; j < response.data.length; j++) {
+        let cgPage = response.data[j].cgPage
+        let cgId = cgData[cgPage].cgInfo[response.data[j].cgId]
+        cgId.image = response.data[j].littleCg
+
+        cgId.cgNum = response.data[j].cgNum
+        cgId.haveData = true
+        let realCgUrlList = response.data[j].cgList.split("∫")
+        for (let k = 0; k < realCgUrlList.length; k++) {
+          cgId.realCgUrl[k] = realCgUrlList[k]
+        }
+      }
+    })
+  },
+
   methods: {
     /**
      * 鼠标进入按钮，切换按钮显示的图片，由indexBtn变量控制
@@ -70,21 +101,17 @@ export default {
     /**
      * 停止标题音乐
      */
-    titleStopBgm: function (item) {
-      if (item.routeId == "story") {
-        this.titleBgmUrl = ''
+    titleStopBgm: function () {
+      this.titleBgmUrl = ''
+    },
+
+    startStory: function (item) {
+      if (item.routeId == 'story') {
+        this.titleStopBgm()
       }
       this.$router.push(({
         name: item.routeId,
       }))
-    },
-
-
-    /**
-     * method:改变标题背景图片
-     * 先通过网络请求获取img的url，然后重新set
-     */
-    changeTitleBg: function () {
     },
 
   }
