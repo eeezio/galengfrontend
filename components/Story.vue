@@ -33,7 +33,7 @@
       </li>
     </ul>
     <!--    test case-->
-    <div v-if="storyMode==true" class="story-dialog-area" @click="nextInstruct(),testCase()">
+    <div v-if="storyMode==true" class="story-dialog-area" @click="nextInstruct()">
       <img :src=storyDialogUrl ondragstart="return false;" crossorigin="anonymous">
       <p v-if="stopAuto==false" class="story-text">
         {{ storyText.autoText }}
@@ -76,6 +76,7 @@
 <script>
 
 import html2canvas from 'html2canvas'
+import axios from "axios";
 
 export default {
   name: "Story",
@@ -94,6 +95,7 @@ export default {
       //
       // storySeUrl: require('../assets/se/0001.ogg'),
 
+      pc: 0,
       storyBg: {
         url: null,
         animationName: null,
@@ -156,13 +158,6 @@ export default {
 
       storyLihuiList: [
         {
-          // lihuiSrc: require('../assets/lihui/0132.png'),
-          // animationName: null,
-          // animationDuration: null,
-          // animationDelay: null,
-          // jumpUp: null,
-          // rightMove: null,
-          // leftMove: null
           lihuiSrc: null,
           animationName: null,
           animationDuration: null,
@@ -181,13 +176,6 @@ export default {
           leftMove: null
         },
         {
-          // lihuiSrc: require('../assets/lihui/0320.png'),
-          // animationName: 'jump-up,jump-down',
-          // animationDuration: '0.3s,0.3s',
-          // animationDelay: '0s,0.3s',
-          // jumpUp: '10%',
-          // rightMove: '20%',
-          // leftMove: null
           lihuiSrc: null,
           animationName: null,
           animationDuration: null,
@@ -206,13 +194,6 @@ export default {
           leftMove: null
         },
         {
-          // lihuiSrc: require('../assets/lihui/0445.png'),
-          // animationName: null,
-          // animationDuration: null,
-          // animationDelay: null,
-          // jumpUp: null,
-          // rightMove: null,
-          // leftMove: null
           lihuiSrc: null,
           animationName: null,
           animationDuration: null,
@@ -225,16 +206,16 @@ export default {
 
       selectBtnList: [
         {
-          selectText: "大家好",
+          selectText: null,
+          varName: null,
+          improveNum: null,
           btnIndex: 0,
           btnSrc: [require("../assets/select/btn_select_off.png"), require("../assets/select/btn_select_over.png")]
         }, {
-          selectText: "欢迎大家陪我",
+          selectText: null,
           btnIndex: 0,
-          btnSrc: [require("../assets/select/btn_select_off.png"), require("../assets/select/btn_select_over.png")]
-        }, {
-          selectText: "继续重修大学计算机",
-          btnIndex: 0,
+          varName: null,
+          improveNum: null,
           btnSrc: [require("../assets/select/btn_select_off.png"), require("../assets/select/btn_select_over.png")]
         }
       ],
@@ -278,23 +259,29 @@ export default {
     document.getElementById("story-se").volume = this.$Global.seVolume * 0.01;
     document.getElementById("story-voice").volume = this.$Global.voiceVolume * 0.01;
     this.textSpeed = this.$Global.textSpeed
+    this.pc = 0
     let runtimeSave = this.$route.params.runtimeSave
     let lihuiSave = this.$route.params.lihuiSave
     window.addEventListener("mouseup", this.setAuto);
-    this.storyBackEndText = runtimeSave.storyText
-    this.storyMode = runtimeSave.storyMode
-    this.selectMode = runtimeSave.selectMode
-    this.storyText.voiceUrl = runtimeSave.storyVoiceUrl
-    this.storySeUrl = runtimeSave.storySeUrl
-    this.storyDialogUrl = runtimeSave.storyDialogUrl
-    this.storyBgmUrl = runtimeSave.storyBgmUrl
-    this.storyBg.url = runtimeSave.storyBgUrl
-    this.storyBg.shakeUp = runtimeSave.storyBgShakeUp
-    this.storyBg.animationDuration = runtimeSave.storyBgAnimationDuration
-    this.storyBg.animationDelay = runtimeSave.storyBgAnimationDelay
-    this.storyBg.animationName = runtimeSave.storyBgAnimationName
-    for (let j = 0; j < lihuiSave.length; j++) {
-      this.storyLihuiList[lihuiSave[j].lihuiId] = lihuiSave[j]
+    if (runtimeSave != null) {
+      this.pc = runtimeSave.pc
+      this.storyBackEndText = runtimeSave.storyText
+      this.storyMode = runtimeSave.storyMode
+      this.selectMode = runtimeSave.selectMode
+      this.storyText.voiceUrl = runtimeSave.storyVoiceUrl
+      this.storySeUrl = runtimeSave.storySeUrl
+      this.storyDialogUrl = runtimeSave.storyDialogUrl
+      this.storyBgmUrl = runtimeSave.storyBgmUrl
+      this.storyBg.url = runtimeSave.storyBgUrl
+      this.storyBg.shakeUp = runtimeSave.storyBgShakeUp
+      this.storyBg.animationDuration = runtimeSave.storyBgAnimationDuration
+      this.storyBg.animationDelay = runtimeSave.storyBgAnimationDelay
+      this.storyBg.animationName = runtimeSave.storyBgAnimationName
+    }
+    if (lihuiSave != null) {
+      for (let j = 0; j < lihuiSave.length; j++) {
+        this.storyLihuiList[lihuiSave[j].lihuiId] = lihuiSave[j]
+      }
     }
     this.nextInstruct()
   },
@@ -335,19 +322,80 @@ export default {
      */
     nextInstruct() {
       this.dialogClickCount += 1
-      //滚动播完或者当前是立即显示，即可获取下一条文本
-      if (this.flag == 1 || this.dialogClickCount % 2 == 0) {
-        this.storyText.immText = this.storyBackEndText;
-        this.storyBackEndText = this.queryNextSentence();
-      }
-      if (!this.stopAuto) {
-        this.autoNextSentence(0);
-      }
-      if (this.dialogClickCount % 2 == 1 && this.stopAuto) {
-        this.rollNextSentence(0)
-      }
-      this.flag = 0
-      //类似懒加载
+      let _this = this
+      let protocal = new Promise(function (resolve, reject) {
+        axios.get("http://localhost:8080/getNextInstruct" + '/' + _this.pc).then((res) => {
+          resolve(res.data)
+        }).catch((err) => {
+          reject(err)
+        })
+      })
+      protocal.then((res) => {
+        console.log(res)
+        _this.pc = res.pc
+        if (res.setText == true) {
+          _this.storyText.storyBackEndText = res.storyBackEndText
+          _this.storyText.storyVoiceUrl = res.storyVoiceUrl
+        }
+        if (res.setBgm == true) {
+          _this.storyBgmUrl = res.storyBgmUrl
+        }
+        if (res.setSe == true) {
+          _this.storySeUrl = res.storySeUrl
+        }
+        if (res.setBg == true) {
+          _this.storyBg.url = res.storyBgUrl
+        }
+        if (res.setBgAnimation == true) {
+          _this.storyBg.animationDelay = res.StoryBgAnimationDelay
+          _this.storyBg.animationDuration = res.StoryBgAnimationDuration
+          _this.storyBg.animationName = res.StoryBgAnimationName
+          _this.storyBg.shakeUp = res.StoryBgShakeUp
+        }
+        if (res.setMask == true) {
+          _this.storyMask.maskUrl = res.StoryMaskUrl
+        }
+        if (res.setMaskAnimation == true) {
+          _this.storyMask.animationDelay = res.StoryMaskAnimationDelay
+          _this.storyMask.animationDuration = res.StoryMaskAnimationDuration
+          _this.storyMask.animationName = res.StoryMaskAnimationName
+        }
+        if (res.setDialog == true) {
+          _this.storyDialogUrl = res.storyDialogUrl
+        }
+        if (res.setSelect == true) {
+          _this.selectMode = true
+          for (let i = 0; i < res.selectList.length; i++) {
+            _this.selectBtnList[i].selectText = res.selectList[i].text
+            _this.selectBtnList[i].varName = res.selectList[i].varName
+            _this.selectBtnList[i].improveNum = res.selectList[i].improveNum
+          }
+        }
+        if (res.setLihui == true) {
+          for (let i = 0; i < res.lihuiList.length; i++) {
+            _this.storyLihuiList[res.lihuiList[i].lihuiId] = res.lihuiList[i]
+            console.log(_this.storyLihuiList[res.lihuiList[i].lihuiId])
+          }
+        }
+      })
+      // console.log(this.storyLihuiList)
+      Promise.all([protocal]).then((result) => {
+        //滚动播完或者当前是立即显示，即可获取下一条文本
+        if (_this.flag == 1 || _this.dialogClickCount % 2 == 0) {
+          _this.storyText.immText = _this.storyBackEndText;
+          this.storyBackEndText = this.queryNextSentence();
+        }
+        if (!_this.stopAuto) {
+          _this.autoNextSentence(0);
+        }
+        if (_this.dialogClickCount % 2 == 1 && _this.stopAuto) {
+          _this.rollNextSentence(0)
+        }
+        _this.flag = 0
+        //类似懒加载
+      }).catch((err) => {
+        console.log(err)
+      })
     }
     ,
 
@@ -480,28 +528,28 @@ export default {
     ,
 
 
-    testCase: function () {
-      this.storyBg.animationDelay = '0s,0.1s,0.2s,0.3s'
-      this.storyBg.animationDuration = '0.1s,0.1s,0.1s,0.1s'
-      this.storyBg.shakeUp = '1%'
-      this.storyBg.animationName = 'shake-up,shake-down,shake-up,shake-down'
-      this.storyLihuiList[0].animationName = 'right-move,left-move'
-      this.storyLihuiList[0].animationDelay = '0s,0.5s'
-      this.storyLihuiList[0].animationDuration = '0.5s,0.5s'
-      this.storyLihuiList[0].rightMove = '20%'
-      this.storyLihuiList[0].leftMove = '0'
-      // this.storyText.voiceUrl = require('../assets/voice/fum_omake_00036.ogg')
-
-      let temp = this.index
-      this.storyMask.maskUrl = this.testCaseMask[temp]
-      this.storyMask.animationDelay = '0s,1.5s'
-      this.storyMask.animationDuration = '1.5s,1s'
-      this.storyMask.animationName = 'img-switch-light,img-switch-dark'
-      this.index++
-      setTimeout(() => {
-        this.resetMask()
-      }, 3000)
-    }
+    // testCase: function () {
+    //   this.storyBg.animationDelay = '0s,0.1s,0.2s,0.3s'
+    //   this.storyBg.animationDuration = '0.1s,0.1s,0.1s,0.1s'
+    //   this.storyBg.shakeUp = '1%'
+    //   this.storyBg.animationName = 'shake-up,shake-down,shake-up,shake-down'
+    //   this.storyLihuiList[0].animationName = 'right-move,left-move'
+    //   this.storyLihuiList[0].animationDelay = '0s,0.5s'
+    //   this.storyLihuiList[0].animationDuration = '0.5s,0.5s'
+    //   this.storyLihuiList[0].rightMove = '20%'
+    //   this.storyLihuiList[0].leftMove = '0'
+    //   // this.storyText.voiceUrl = require('../assets/voice/fum_omake_00036.ogg')
+    //
+    //   let temp = this.index
+    //   this.storyMask.maskUrl = this.testCaseMask[temp]
+    //   this.storyMask.animationDelay = '0s,1.5s'
+    //   this.storyMask.animationDuration = '1.5s,1s'
+    //   this.storyMask.animationName = 'img-switch-light,img-switch-dark'
+    //   this.index++
+    //   setTimeout(() => {
+    //     this.resetMask()
+    //   }, 3000)
+    // }
   }
 
 }
